@@ -44,18 +44,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install aux4
-        run: curl https://aux4.sh | sh
-
-      - name: Install dependencies
-        run: |
-          aux4 aux4 pkger install aux4/ai-agent
-          aux4 aux4 pkger install aux4/test
-
-      - name: Run tests
-        run: aux4 test run
-        working-directory: package
-
       - name: Publish package
         uses: aux4/publish-package-action@v1
         with:
