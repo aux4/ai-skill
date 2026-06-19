@@ -1,7 +1,7 @@
 {
   "scope": "aux4",
   "name": "ai-skill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Native skill framework for aux4 — author, discover, run, and export agent skills",
   "license": "Apache-2.0",
   "tags": [
