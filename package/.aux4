@@ -1,0 +1,146 @@
+{
+  "scope": "aux4",
+  "name": "ai-skill",
+  "version": "1.0.0",
+  "description": "Native skill framework for aux4 — author, discover, run, and export agent skills",
+  "license": "Apache-2.0",
+  "tags": [
+    "ai",
+    "skill",
+    "agent",
+    "framework"
+  ],
+  "dependencies": [
+    "aux4/ai-agent"
+  ],
+  "profiles": [
+    {
+      "name": "main",
+      "commands": [
+        {
+          "name": "ai",
+          "execute": [
+            "profile:ai"
+          ],
+          "help": {
+            "text": "Artificial Intelligence"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ai",
+      "commands": [
+        {
+          "name": "skill",
+          "execute": [
+            "profile:ai:skill"
+          ],
+          "help": {
+            "text": "Author, run, and export aux4 agent skills"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ai:skill",
+      "commands": [
+        {
+          "name": "list",
+          "execute": [
+            "sh ${packageDir}/lib/list-skills.sh"
+          ],
+          "help": {
+            "text": "List installed native skills with their descriptions"
+          }
+        },
+        {
+          "name": "export",
+          "execute": [
+            "sh ${packageDir}/lib/export-skill.sh values(name, format, output)"
+          ],
+          "help": {
+            "text": "Export a skill to an interop format (SKILL.md, AGENTS.md, or MCP)",
+            "variables": [
+              {
+                "name": "name",
+                "text": "The name of the skill to export",
+                "arg": true
+              },
+              {
+                "name": "format",
+                "text": "The output format",
+                "default": "skill",
+                "options": [
+                  "skill",
+                  "agents",
+                  "mcp"
+                ]
+              },
+              {
+                "name": "output",
+                "text": "The file to write the export to (defaults to stdout)",
+                "default": ""
+              }
+            ]
+          }
+        },
+        {
+          "name": "init",
+          "execute": [
+            "sh ${packageDir}/lib/init-skill.sh values(name)"
+          ],
+          "help": {
+            "text": "Scaffold a new native skill in the current directory",
+            "variables": [
+              {
+                "name": "name",
+                "text": "The name of the skill to scaffold",
+                "arg": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "example",
+          "execute": [
+            "profile:ai:skill:example"
+          ],
+          "help": {
+            "text": "Example skill: how to author and use aux4 skills"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ai:skill:example",
+      "commands": [
+        {
+          "name": "prompt",
+          "execute": [
+            "cat ${packageDir}/instructions/example.md"
+          ],
+          "help": {
+            "text": "Show the example skill instructions"
+          }
+        },
+        {
+          "name": "run",
+          "execute": [
+            "aux4 ai agent ask --instructions ${packageDir}/instructions/example.md param(question)"
+          ],
+          "help": {
+            "text": "Run the example skill with a question",
+            "variables": [
+              {
+                "name": "question",
+                "text": "The question to ask the example skill",
+                "arg": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

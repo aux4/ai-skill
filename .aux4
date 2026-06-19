@@ -1,0 +1,9 @@
+{
+  "profiles": [
+    {
+      "name": "main",
+      "commands": []
+    }
+  ],
+  "version": "1.0.0"
+}
