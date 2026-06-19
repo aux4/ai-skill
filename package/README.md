@@ -1,10 +1,10 @@
 # aux4/ai-skill
 
-Native skill framework for aux4 — author, discover, run, and export agent skills.
+Native skill framework for aux4 — author, discover, validate, and export agent skills.
 
-A **native skill** teaches an AI agent how to use specific aux4 commands. Native skills are contributed by aux4 packages that extend the shared `ai:skill` profile. The framework provides discovery (`list`), interop export (`export`), and scaffolding (`init`), plus a bundled `example` skill that demonstrates the contribution contract end to end.
+A **native skill** teaches an AI agent how to use specific aux4 capabilities. Native skills are contributed by aux4 packages that extend the shared `ai:skill` profile. This package is a pure, LLM-agnostic **framework**: it owns the contract and provides discovery (`list`), validation (`validate`), scaffolding (`init`), and interop export (`export`). It ships **skills-free** — on a clean install `aux4 ai skill list` reports zero skills. Skills come from other packages.
 
-> **Native vs. market skills:** This package (`aux4 ai skill`, singular) is the aux4-native skill framework. It is distinct from `aux4 ai skills` (plural), which installs market-standard `SKILL.md` files from the open skills ecosystem. The two are complementary and intentionally kept separate.
+> **Native vs. market skills:** This package (`aux4 ai skill`, singular) is the aux4-native skill framework. It is distinct from `aux4 ai skills` (plural), which installs market-standard `SKILL.md` files from the open skills ecosystem. The two are complementary and intentionally kept separate; `export` bridges native skills into `SKILL.md` / `AGENTS.md` / MCP.
 
 ## Installation
 
@@ -15,17 +15,17 @@ aux4 aux4 pkger install aux4/ai-skill
 ## Quick Start
 
 ```bash
-# List the native skills installed on your machine
+# List the native skills installed on your machine (empty on a clean install)
 aux4 ai skill list
-
-# Read the bundled example skill's instructions
-aux4 ai skill example prompt
-
-# Export a skill to a SKILL.md document
-aux4 ai skill export example --format skill
 
 # Scaffold a new skill in the current directory
 aux4 ai skill init deploy
+
+# Check a skill conforms to the native skill contract
+aux4 ai skill validate deploy
+
+# Export a skill to a SKILL.md document
+aux4 ai skill export deploy --format skill
 ```
 
 ## Commands
@@ -33,22 +33,41 @@ aux4 ai skill init deploy
 | Command | Description |
 |---------|-------------|
 | `aux4 ai skill list` | List installed native skills with descriptions |
+| `aux4 ai skill validate` | Check a skill conforms to the native skill contract |
 | `aux4 ai skill export` | Export a skill to an interop format (`SKILL.md`, `AGENTS.md`, or MCP) |
 | `aux4 ai skill init` | Scaffold a new native skill in the current directory |
-| `aux4 ai skill example prompt` | Show the bundled example skill's instructions |
-| `aux4 ai skill example run` | Run the example skill against a question (requires an LLM) |
 
 ### aux4 ai skill list
 
-Discovers native skills by parsing `aux4 ai skill --help` and printing a catalog of skill names and descriptions. The reserved framework commands (`list`, `export`, `init`) are excluded.
+Discovers native skills by parsing `aux4 ai skill --help` and printing a catalog of skill names and descriptions. The reserved framework commands (`list`, `validate`, `export`, `init`) are excluded. Returns no output until packages contribute skills.
 
 ```bash
 aux4 ai skill list
 ```
 
 ```text
-example  -  Example skill: how to author and use aux4 skills
+deploy  -  Deploy applications using aux4 commands
 ```
+
+### aux4 ai skill validate
+
+Checks that an installed skill conforms to the native skill contract: it must be registered under the `ai:skill` profile, have a non-empty `help.text`, and (recommended) expose at least one command. `prompt` is optional; `run` is not part of the contract.
+
+```bash
+aux4 ai skill validate <name>
+```
+
+```text
+Validating native skill: deploy
+
+  [PASS] registered under the ai:skill profile
+  [PASS] has help.text: Deploy applications using aux4 commands
+  [PASS] exposes 1 command(s) in the ai:skill:deploy profile
+
+Skill 'deploy' conforms to the native skill contract.
+```
+
+The command exits non-zero when the skill does not conform.
 
 ### aux4 ai skill export
 
@@ -63,14 +82,14 @@ aux4 ai skill export <name> [--format <skill|agents|mcp>] [--output <file>]
 - `mcp` — a JSON MCP tool definition wrapping the skill.
 
 ```bash
-aux4 ai skill export example --format skill
-aux4 ai skill export example --format agents --output AGENTS.md
-aux4 ai skill export example --format mcp --output example.mcp.json
+aux4 ai skill export deploy --format skill
+aux4 ai skill export deploy --format agents --output AGENTS.md
+aux4 ai skill export deploy --format mcp --output deploy.mcp.json
 ```
 
 ### aux4 ai skill init
 
-Scaffolds a new native skill. It creates `instructions/<name>.md` (only if it does not already exist) and prints the `.aux4` profile snippet to embed the skill.
+Scaffolds a new native skill. It creates `instructions/<name>.md` and a `man/ai_skill_<name>__prompt.md` stub (only if they do not already exist) and prints the `.aux4` profile snippet to embed the skill. The snippet contains a routing command with `help.text` and an optional `prompt` command — and no `run`.
 
 ```bash
 aux4 ai skill init <name>
@@ -80,27 +99,35 @@ aux4 ai skill init <name>
 aux4 ai skill init deploy
 ```
 
-### aux4 ai skill example
+## The Native Skill Contract
 
-The bundled reference skill demonstrating the contribution contract. It teaches an agent how to discover and run aux4 commands.
+A native skill is just an aux4 package that contributes to the shared `ai:skill` profile. The framework owns this contract; skills conform to it.
 
-```bash
-aux4 ai skill example prompt
-aux4 ai skill example run "How do I list installed packages?"
-```
+### Disclosure ladder
 
-`prompt` only prints the instructions (no AI dependency). `run` hands the instructions to `aux4 ai agent ask` and requires an LLM provider to be configured for `aux4/ai-agent`.
+Skills are designed for **progressive disclosure** so agents stay lean — they read only what they need, when they need it:
 
-## Embedding a Skill (Contribution Contract)
+1. **`help.text`** (REQUIRED) — the `--help` discovery layer: a sharp one-liner for the skill plus one per command. Always loaded, cheap. This is what `aux4 ai skill list` and `aux4 ai skill --help` surface.
+2. **`man/<profile>__<command>.md`** (recommended) — the richer "is this a good fit?" middle tier. An agent reads it on demand to assess a candidate skill without loading prose.
+3. **`prompt`** (OPTIONAL) — deep when/how/workflow/rules guidance for non-trivial skills. Loaded only when a complex skill is actually engaged.
+4. **`--help`** — command signatures and parameters, provided for free by aux4.
 
-Any aux4 package can contribute a native skill. The contract is:
+### Contract
 
-1. Add a `<name>` command to the `ai:skill` profile that routes to an `ai:skill:<name>` profile.
-2. In the `ai:skill:<name>` profile, expose:
-   - `prompt` — `cat`s the skill's instructions markdown. **No AI dependency** — this is what `list` and `export` rely on, so it must always work offline.
-   - `run` (optional) — calls `aux4 ai agent ask` with the instructions to execute the skill.
+- Skills live under scope `agent`, named `skill-<name>` (e.g. `agent/skill-memory`).
+- Skills depend on **`aux4/ai-skill` only** — never on `aux4/ai-agent` (skills are LLM-agnostic; the LLM belongs to the runtime).
+- Skills contribute a `<name>` command to the `ai:skill` profile and an `ai:skill:<name>` profile.
+- Skills MUST have a sharp `help.text` (skill one-liner + one per command) — the required discovery layer.
+- Skills MAY expose domain commands (their actual capabilities), man pages (fit info), and an optional `prompt` command (deep guidance).
+- Skills have **no `run` command.** Running a skill is a runtime concern (`aux4 ai agent ask --instructions <prompt>`), not part of the skill. Baking `run` into a skill would invert the dependency (skill → ai-agent), so it is dropped from the contract.
+- The names `list`, `validate`, `export`, and `init` are **reserved** by the framework and must not be used as skill names.
 
-The names `list`, `export`, and `init` are **reserved** by the framework and must not be used as skill names.
+### Two skill flavors
+
+- **Command skill** (deterministic, e.g. `memory`): `help.text` + domain commands (+ optional `prompt`). The agent calls the commands directly with its own tools. Leanest — zero instruction injection.
+- **Instruction skill** (LLM-task guidance, e.g. `research`, `planner`): `help.text` + `prompt`. The agent loads the prompt on demand and follows it with its own tools.
+
+### Embedding a skill
 
 Run `aux4 ai skill init <name>` to generate the snippet, or copy this template into your package `.aux4`:
 
@@ -130,23 +157,7 @@ Run `aux4 ai skill init <name>` to generate the snippet, or copy this template i
             "cat ${packageDir}/instructions/deploy.md"
           ],
           "help": {
-            "text": "Show the deploy skill instructions"
-          }
-        },
-        {
-          "name": "run",
-          "execute": [
-            "aux4 ai agent ask --instructions ${packageDir}/instructions/deploy.md param(question)"
-          ],
-          "help": {
-            "text": "Run the deploy skill with a question",
-            "variables": [
-              {
-                "name": "question",
-                "text": "The question to ask the deploy skill",
-                "arg": true
-              }
-            ]
+            "text": "Show the deploy skill guidance (optional)"
           }
         }
       ]
@@ -155,11 +166,11 @@ Run `aux4 ai skill init <name>` to generate the snippet, or copy this template i
 }
 ```
 
-Add `"aux4/ai-skill"` (and `"aux4/ai-agent"` if you use `run`) to your package `dependencies`. Once installed, the skill appears in `aux4 ai skill list` and can be exported with `aux4 ai skill export deploy`.
+Add `"aux4/ai-skill"` to your package `dependencies` (so the `ai:skill` profile exists for discovery). Add your own domain commands to the `ai:skill:deploy` profile. Once installed, the skill appears in `aux4 ai skill list`, validates with `aux4 ai skill validate deploy`, and exports with `aux4 ai skill export deploy`.
 
 ## Dependencies
 
-- `aux4/ai-agent` — LLM agent framework used by `run` commands.
+This framework has no skill dependencies — it is LLM-agnostic and ships skills-free.
 
 ## License
 

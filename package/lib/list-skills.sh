@@ -3,8 +3,8 @@
 #
 # The help output lists each command in the `ai:skill` profile as a name line
 # indented by exactly two spaces, followed by a two-space-indented description
-# line. Reserved framework commands (list, export, init) are excluded so that
-# only contributed skills are shown.
+# line. Reserved framework commands (list, validate, export, init) are excluded
+# so that only contributed skills are shown.
 #
 # Output format (one skill per line):
 #   <name>  -  <description>
@@ -18,7 +18,7 @@ printf '%s\n' "$help" | awk '
   # A command name line: exactly two leading spaces, then a non-dash word.
   /^  [^ -][^ ]*[[:space:]]*$/ {
     name = $1
-    if (name == "list" || name == "export" || name == "init") {
+    if (name == "list" || name == "validate" || name == "export" || name == "init") {
       pending = ""
       next
     }
