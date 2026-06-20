@@ -23,25 +23,25 @@ name       The name of the skill to export (positional argument)
 #### Example
 
 ```bash
-aux4 ai skill export example --format skill
+aux4 ai skill export deploy --format skill
 ```
 
 ```text
 ---
-name: example
-description: Discover and run aux4 commands to accomplish a user's task.
+name: deploy
+description: Deploy applications using aux4 commands.
 ---
 
-Discover and run aux4 commands to accomplish a user's task.
+Deploy applications using aux4 commands.
 ...
 ```
 
 Write an MCP tool definition to a file:
 
 ```bash
-aux4 ai skill export example --format mcp --output example.mcp.json
+aux4 ai skill export deploy --format mcp --output deploy.mcp.json
 ```
 
 ```text
-Exported skill 'example' to example.mcp.json
+Exported skill 'deploy' to deploy.mcp.json
 ```
