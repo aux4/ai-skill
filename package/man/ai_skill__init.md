@@ -4,7 +4,7 @@ The `init` command scaffolds a new native skill in the current working directory
 
 It creates (only when they do not already exist, so it never overwrites your work):
 
-- `instructions/<name>.md` — a starter prompt template for the skill's optional deep guidance.
+- `instructions/prompt.md` — a starter prompt template for the skill's optional deep guidance.
 - `man/ai_skill_<name>__prompt.md` — a man page stub for the optional `prompt` command.
 
 It then prints the `.aux4` profile snippet to embed the skill, conforming to the native skill contract:
@@ -29,7 +29,7 @@ aux4 ai skill init deploy
 ```
 
 ```text
-Created instructions/deploy.md
+Created instructions/prompt.md
 Created man/ai_skill_deploy__prompt.md
 
 Add the following to your package .aux4 to embed the skill.

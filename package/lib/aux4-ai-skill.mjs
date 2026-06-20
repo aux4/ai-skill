@@ -324,7 +324,7 @@ const SNIPPET_TEMPLATE = name => `    {
         {
           "name": "prompt",
           "execute": [
-            "cat \${packageDir}/instructions/${name}.md"
+            "cat \${packageDir}/instructions/prompt.md"
           ],
           "help": {
             "text": "Show the ${name} skill guidance (optional)"
@@ -340,7 +340,7 @@ function cmdInit(name) {
   }
 
   fs.mkdirSync("instructions", { recursive: true });
-  const file = path.join("instructions", `${name}.md`);
+  const file = path.join("instructions", "prompt.md");
 
   if (fs.existsSync(file)) {
     console.log(`Skill instructions already exist at ${file} (left unchanged)`);

@@ -89,7 +89,7 @@ aux4 ai skill export deploy --format mcp --output deploy.mcp.json
 
 ### aux4 ai skill init
 
-Scaffolds a new native skill. It creates `instructions/<name>.md` and a `man/ai_skill_<name>__prompt.md` stub (only if they do not already exist) and prints the `.aux4` profile snippet to embed the skill. The snippet contains a routing command with `help.text` and an optional `prompt` command — and no `run`.
+Scaffolds a new native skill. It creates `instructions/prompt.md` and a `man/ai_skill_<name>__prompt.md` stub (only if they do not already exist) and prints the `.aux4` profile snippet to embed the skill. The snippet contains a routing command with `help.text` and an optional `prompt` command — and no `run`.
 
 ```bash
 aux4 ai skill init <name>
@@ -154,7 +154,7 @@ Run `aux4 ai skill init <name>` to generate the snippet, or copy this template i
         {
           "name": "prompt",
           "execute": [
-            "cat ${packageDir}/instructions/deploy.md"
+            "cat ${packageDir}/instructions/prompt.md"
           ],
           "help": {
             "text": "Show the deploy skill guidance (optional)"

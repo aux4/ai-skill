@@ -13,13 +13,13 @@ aux4 ai skill init deploy
 ```
 
 ```expect:partial
-Created instructions/deploy.md
+Created instructions/prompt.md
 ```
 
 ### should write a starter template into the instructions file
 
 ```execute
-cat instructions/deploy.md
+cat instructions/prompt.md
 ```
 
 ```expect:partial
