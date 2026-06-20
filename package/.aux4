@@ -45,7 +45,7 @@
         {
           "name": "list",
           "execute": [
-            "sh ${packageDir}/lib/list-skills.sh"
+            "node ${packageDir}/lib/aux4-ai-skill.mjs list"
           ],
           "help": {
             "text": "List installed native skills with their descriptions"
@@ -54,7 +54,7 @@
         {
           "name": "validate",
           "execute": [
-            "sh ${packageDir}/lib/validate-skill.sh values(name)"
+            "node ${packageDir}/lib/aux4-ai-skill.mjs validate values(name)"
           ],
           "help": {
             "text": "Validate that a skill conforms to the native skill contract",
@@ -70,7 +70,7 @@
         {
           "name": "export",
           "execute": [
-            "sh ${packageDir}/lib/export-skill.sh values(name, format, output)"
+            "node ${packageDir}/lib/aux4-ai-skill.mjs export values(name, format, output)"
           ],
           "help": {
             "text": "Export a skill to an interop format (SKILL.md, AGENTS.md, or MCP)",
@@ -101,7 +101,7 @@
         {
           "name": "init",
           "execute": [
-            "sh ${packageDir}/lib/init-skill.sh values(name)"
+            "node ${packageDir}/lib/aux4-ai-skill.mjs init values(name)"
           ],
           "help": {
             "text": "Scaffold a new native skill in the current directory",
